@@ -17,6 +17,10 @@ body {
     background-image: url(../img/book-bg.jpg);
 }
 
+body.rtl {
+    direction: rtl;
+}
+
 h1 {
     font-family: 'Bangers', cursive;
     background-color: #f5f9f9;
@@ -26,7 +30,6 @@ h1 {
     color: #4c372a;
     font-size: 50px;
 }
-
 
 .read-class button {
     color: white;
@@ -68,8 +71,16 @@ button:hover {
 .new-book {
     display: block;
     margin-inline-start: 0;
-    margin-bottom: 10px;
+    margin-block-end: 10px;
     background-color: #e89191;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+}
+
+.select-lang {
+    display: block;
+    margin-inline-end: 0;
+    margin-block-end: 10px;
+    background-color: #dcc6c6;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }
 

@@ -1,7 +1,9 @@
 'use strict'
 
+var language = 'en'
 
 function onInit() {
+    doTrans()
     renderFilterByQueryStringParams()
     renderBooks()
     console.log('gBooks', gBooks)
@@ -14,40 +16,52 @@ function renderBooks() {
     <td>${book.id}</td>
     <td>${book.name}</td>
     <th>${book.price}$</th>
-    <td class="read-class"><button onclick="onReadBook(${book.id})">Read</button></td>
-    <td class="update-class"><button onclick="onUpdateBook(${book.id})">Update</button></td>
-    <td class="delete-class"><button onclick="onRemoveBook(${book.id})">Delete</button></td>
+    <td class="read-class"><button onclick="onReadBook(${book.id})" data-trans="read">Read</button></td>
+    <td class="update-class"><button onclick="onUpdateBook(${book.id})" data-trans="update">Update</button></td>
+    <td class="delete-class"><button onclick="onRemoveBook(${book.id})" data-trans="delete">Delete</button></td>
     </tr>
     `
     )
     document.querySelector('.books-container').innerHTML = strHtmls.join('')
+    doTrans()
 }
 
 function onRemoveBook(bookId) {
     removeBook(bookId)
     renderBooks()
-    flashMsg(`Book Deleted`)
+    var msg = (language === 'en') ? 'Book Deleted' : 'הספר נמחק בהצלחה'
+    flashMsg(msg)
 }
 
 function onAddBook() {
-    var name = prompt('What is the name of the book?')
-    var price = +prompt('What is the price of the book? ($)')
+    var msg = ''
+    if(language === 'en') {
+        var name = prompt('What is the name of the book?')
+        var price = +prompt('What is the price of the book? ($)')
+    } else {
+        var name = prompt('מהו שם הספר?')
+        var price = +prompt('מהו מחיר הספר? (₪)')
+    }
     if (name && price) {
         const book = addBook(name, price)
         renderBooks()
-        flashMsg(`Book Added (id: ${book.id})`)
+        msg = (language === 'en') ? `Book Added (id: ${book.id})` : `נוסף ספר חדש (מס"ד: ${book.id})`
+        flashMsg(msg)
     } else {
-        flashMsg('Some details are missing!')
+        msg = (language === 'en') ? 'Some details are missing!' : 'חסרים פרטים בהזנת הספר החדש'
+        flashMsg(msg)
     }
 }
 
 function onUpdateBook(bookId) {
     const book = getBookById(bookId)
-    var newPrice = +prompt('What is the new price?', book.price)
+    var promptMsg = (language === 'en') ? 'What is the new price?' : 'מהו המחיר החדש?'
+    var newPrice = +prompt(promptMsg, book.price)
     if (newPrice && book.price !== newPrice) {
         const updatedBook = updateBook(bookId, newPrice)
         renderBooks()
-        flashMsg(`Price updated to: ${updatedBook.price}$`)
+        var msg = (language === 'en') ? `Price updated to: ${updatedBook.price}$` : `המחיר עודכן ל: ${updatedBook.price}$`
+        flashMsg(msg)
     }
 }
 
@@ -59,17 +73,18 @@ function showModal(bookId) {
     var book = getBookById(bookId)
     const elModal = document.querySelector('.modal')
     const strHtml = `
-    <h3><span>Book Title: ${book.name}</span></h3>
-    <h4>Book Price: $${book.price}</h4>
-    <h5>Book Rate: ${book.rate}</h5>
-    <p>Book summry: ${book.description}</p>
-    <div class="change-rate">Change rate:
+    <h3><span data-trans="book-title">Book Title:</span>${book.name}</h3>
+    <h4><span data-trans="price">Book Price:</span>$${book.price}</h4>
+    <h5><span data-trans="rate">Book Rate:</span>${book.rate}</h5>
+    <p><span data-trans="summary">Book Summary:</span>${book.description}</p>
+    <div class="change-rate"><span data-trans="change-rate">Change rate:</span>
     <button onclick="onDowngradeRate(${book.id})">-</button>
-        <span>${book.rate}</span>
+        <span> ${book.rate} </span>
     <button onclick="onUpgradeRate(${book.id})">+</button></div>
-    <button class="close-btn" onclick="onCloseModal(${book.id})">close</button>`
+    <button data-trans="close-modal" class="close-btn" onclick="onCloseModal(${book.id})">Close</button>`
     elModal.innerHTML = strHtml
     elModal.classList.add('open')
+    doTrans()
 }
 
 function flashMsg(msg) {
@@ -131,4 +146,13 @@ function onPrevPage() {
 function onNextPage() {
     nextPage()
     renderBooks()
+}
+
+function onSetLang(lang) {
+    setLang(lang)
+    if (lang === 'he') document.body.classList.add('rtl')
+    else document.body.classList.remove('rtl')
+    renderBooks()
+    doTrans()
+    language = lang
 }

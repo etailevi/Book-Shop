@@ -1,7 +1,7 @@
 'use strict'
 
 const STORAGE_KEY = 'booksDB'
-const PAGE_SIZE = 3
+const PAGE_SIZE = 4
 
 
 var gBooks
@@ -105,6 +105,7 @@ function setBookFilter(filterBy) {
     if (filterBy.name !== undefined) gFilterBy.name = filterBy.name
     if (filterBy.maxPrice !== undefined) gFilterBy.maxPrice = filterBy.maxPrice
     if (filterBy.minRate !== undefined) gFilterBy.minRate = filterBy.minRate
+    gPageIdx = 0
     return gFilterBy
 }
 
