@@ -18,14 +18,18 @@
 
         <h1 data-trans="main-title">It's All About The Books</h1>
         <div class="books-wrapper">
-            <button title="Add book" class="new-book" data-trans="new-book" onclick="onAddBook()">Create new book</button>
-            <select class="select-lang" onchange="onSetLang(this.value)">
-                <option value="en">English</option>
-                <option value="he">עברית</option>
-              </select>
+            <div class="panel">
+                <button title="Add book" class="new-book" data-trans="new-book" onclick="onAddBook()">Create new
+                    book</button>
+                <select class="select-lang" onchange="onSetLang(this.value)">
+                    <option value="en">English</option>
+                    <option value="he">עברית</option>
+                </select>
+            </div>
+
             <section class="book-filter">
-                <input type="text" class="search-box" data-trans="search-box-placeholder" oninput="onSetFilterBy({name: value})"
-                    placeholder="Search by name" />
+                <input type="text" class="search-box" data-trans="search-box-placeholder"
+                    oninput="onSetFilterBy({name: value})" placeholder="Search by name" />
                 <label>
                     <span data-trans="max-price">Max Price:</span>
                     <input type="range" min="0" max="100" value="25" class="filter-price-range"
@@ -61,7 +65,7 @@
 
         <div class="user-msg"></div>
     </div>
-
+    <script src="lib/hammer.min.js"></script>
     <script src="js/services/util.service.js"></script>
     <script src="js/services/i18n.service.js"></script>
     <script src="js/services/book.service.js"></script>

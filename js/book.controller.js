@@ -1,16 +1,19 @@
 'use strict'
 
-var gLanguage = 'en'
-var gOptions = { style: 'currency', currency: 'USD' }
+let gShownBook 
+let gLanguage = 'en'
+let gOptions = { style: 'currency', currency: 'USD' }
 
 function onInit() {
     renderFilterByQueryStringParams()
     updateQueryString()
     renderBooks()
+    onSwipe()
 }
 
 function renderBooks() {
     var books = getBooks()
+    console.log('books', books)
     var strHtmls = books.map(book => `
     <tr>
     <td>${book.id}</td>
@@ -70,18 +73,18 @@ function onReadBook(bookId) {
 }
 
 function showModal(bookId) {
-    var book = getBookById(bookId)
+    gShownBook = getBookById(bookId)
     const elModal = document.querySelector('.modal')
     const strHtml = `
-    <h3><span data-trans="book-title">Title</span>${book.name}</h3>
-    <h4><span data-trans="price">Book Price:</span>${formatCurrency(book.price)}</h4>
-    <h5><span data-trans="rate">Book Rate:</span>${book.rate}</h5>
-    <p><span data-trans="summary">Book Summary:</span>${book.description}</p>
+    <h3><span data-trans="book-title">Title</span>${gShownBook.name}</h3>
+    <h4><span data-trans="price">Book Price:</span>${formatCurrency(gShownBook.price)}</h4>
+    <h5><span data-trans="rate">Book Rate:</span>${gShownBook.rate}</h5>
+    <p><span data-trans="summary">Book Summary:</span>${gShownBook.description}</p>
     <div class="change-rate"><div data-trans="change-rate">Change rate:</div>
-    <button onclick="onDowngradeRate(${book.id})">-</button>
-        <span> ${book.rate} </span>
-    <button onclick="onUpgradeRate(${book.id})">+</button></div>
-    <button data-trans="close-modal" class="close-btn" onclick="onCloseModal(${book.id})">Close</button>`
+    <button onclick="onDowngradeRate(${gShownBook.id})">-</button>
+        <span> ${gShownBook.rate} </span>
+    <button onclick="onUpgradeRate(${gShownBook.id})">+</button></div>
+    <button data-trans="close-modal" class="close-btn" onclick="onCloseModal(${gShownBook.id})">Close</button>`
     elModal.innerHTML = strHtml
     elModal.classList.add('open')
     doTrans()
@@ -161,6 +164,25 @@ function onSetLang(lang) {
     renderBooks()
 }
 
-function formatCurrency(num) {
+function formatCurrency(num) { // Should move to utils and add additional params.
     return new Intl.NumberFormat(gLanguage, gOptions).format(num)
+}
+
+function onSetSortBy(value) {
+    console.log('value:', value)
+    setSortBy(value)
+    renderBooks()
+}
+
+function onSwipe() {
+    const elModal = document.querySelector('.modal')
+    const gHammerContainer = new Hammer(elModal)
+    gHammerContainer.on('swipeleft swiperight', (ev) => {
+        if(ev.type === 'swipeleft' && gShownBook.next) {
+            showModal(gShownBook.next)
+        }
+        if (ev.type === 'swiperight' && gShownBook.prev) {
+            showModal(gShownBook.prev)
+        }
+    })
 }

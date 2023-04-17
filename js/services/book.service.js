@@ -9,6 +9,7 @@ var gNames = ['Alice in Wonderland', 'Eat, Pray, Love', 'The Holy Bible', 'Lion 
 var gPrices = [16.99, 30.50, 65.50, 22.10, 26.70]
 var gFilterBy = { maxPrice: 100, minRate: 0, name: '' }
 var gPageIdx = 0
+let gSortBy = 'title'
 
 _createBooks()
 
@@ -26,6 +27,18 @@ function getBooks() {
             book.price <= gFilterBy.maxPrice &&
             book.rate >= gFilterBy.minRate)
     }
+    books.forEach((book, idx) => {
+        if (idx) {
+            book['prev'] = books[idx - 1].id
+        } else {
+            book['prev'] = null
+        }
+        if (idx !== books.length - 1) {
+            book['next'] = books[idx + 1].id
+        } else {
+            book['next'] = null
+        }
+    })
     const startIdx = gPageIdx * PAGE_SIZE
     return books.slice(startIdx, startIdx + PAGE_SIZE)
 }
@@ -131,4 +144,14 @@ function nextPage() {
     document.querySelector('.prev-page').disabled = false
 }
 
+function _compareByTitle(book1, book2) {
+    return book1.title.localeCompare(book2.title)
+}
 
+function _compareByPrice(book1, book2) {
+    return book1.price - book2.price
+}
+
+function setSortBy(value) {
+    gSortBy = value
+}
