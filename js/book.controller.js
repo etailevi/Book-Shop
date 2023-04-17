@@ -1,12 +1,12 @@
 'use strict'
 
-var language = 'en'
+var gLanguage = 'en'
+var gOptions = { style: 'currency', currency: 'USD' }
 
 function onInit() {
-    doTrans()
     renderFilterByQueryStringParams()
+    updateQueryString()
     renderBooks()
-    console.log('gBooks', gBooks)
 }
 
 function renderBooks() {
@@ -15,7 +15,7 @@ function renderBooks() {
     <tr>
     <td>${book.id}</td>
     <td>${book.name}</td>
-    <th>${book.price}$</th>
+    <th>${formatCurrency(book.price)}</th>
     <td class="read-class"><button onclick="onReadBook(${book.id})" data-trans="read">Read</button></td>
     <td class="update-class"><button onclick="onUpdateBook(${book.id})" data-trans="update">Update</button></td>
     <td class="delete-class"><button onclick="onRemoveBook(${book.id})" data-trans="delete">Delete</button></td>
@@ -29,13 +29,13 @@ function renderBooks() {
 function onRemoveBook(bookId) {
     removeBook(bookId)
     renderBooks()
-    var msg = (language === 'en') ? 'Book Deleted' : 'הספר נמחק בהצלחה'
+    var msg = (gLanguage === 'en') ? 'Book Deleted' : 'הספר נמחק בהצלחה'
     flashMsg(msg)
 }
 
 function onAddBook() {
     var msg = ''
-    if(language === 'en') {
+    if (gLanguage === 'en') {
         var name = prompt('What is the name of the book?')
         var price = +prompt('What is the price of the book? ($)')
     } else {
@@ -45,22 +45,22 @@ function onAddBook() {
     if (name && price) {
         const book = addBook(name, price)
         renderBooks()
-        msg = (language === 'en') ? `Book Added (id: ${book.id})` : `נוסף ספר חדש (מס"ד: ${book.id})`
+        msg = (gLanguage === 'en') ? `Book Added (id: ${book.id})` : `נוסף ספר חדש (מס"ד: ${book.id})`
         flashMsg(msg)
     } else {
-        msg = (language === 'en') ? 'Some details are missing!' : 'חסרים פרטים בהזנת הספר החדש'
+        msg = (gLanguage === 'en') ? 'Some details are missing!' : 'חסרים פרטים בהזנת הספר החדש'
         flashMsg(msg)
     }
 }
 
 function onUpdateBook(bookId) {
     const book = getBookById(bookId)
-    var promptMsg = (language === 'en') ? 'What is the new price?' : 'מהו המחיר החדש?'
+    var promptMsg = (gLanguage === 'en') ? 'What is the new price?' : 'מהו המחיר החדש?'
     var newPrice = +prompt(promptMsg, book.price)
     if (newPrice && book.price !== newPrice) {
         const updatedBook = updateBook(bookId, newPrice)
         renderBooks()
-        var msg = (language === 'en') ? `Price updated to: ${updatedBook.price}$` : `המחיר עודכן ל: ${updatedBook.price}$`
+        var msg = (gLanguage === 'en') ? `Price updated to: ${formatCurrency(book.price)}` : `המחיר עודכן ל: ${formatCurrency(book.price)}`
         flashMsg(msg)
     }
 }
@@ -73,11 +73,11 @@ function showModal(bookId) {
     var book = getBookById(bookId)
     const elModal = document.querySelector('.modal')
     const strHtml = `
-    <h3><span data-trans="book-title">Book Title:</span>${book.name}</h3>
-    <h4><span data-trans="price">Book Price:</span>$${book.price}</h4>
+    <h3><span data-trans="book-title">Title</span>${book.name}</h3>
+    <h4><span data-trans="price">Book Price:</span>${formatCurrency(book.price)}</h4>
     <h5><span data-trans="rate">Book Rate:</span>${book.rate}</h5>
     <p><span data-trans="summary">Book Summary:</span>${book.description}</p>
-    <div class="change-rate"><span data-trans="change-rate">Change rate:</span>
+    <div class="change-rate"><div data-trans="change-rate">Change rate:</div>
     <button onclick="onDowngradeRate(${book.id})">-</button>
         <span> ${book.rate} </span>
     <button onclick="onUpgradeRate(${book.id})">+</button></div>
@@ -112,14 +112,17 @@ function onDowngradeRate(bookId) {
     dynamicRate.innerText = book.rate
 }
 
+function updateQueryString() {
+    const filterBy = getFilterBy()
+    const queryStringParams = `?lang=${gLanguage}&name=${filterBy.name}&maxPrice=${filterBy.maxPrice}&minRate=${filterBy.minRate}`
+    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryStringParams
+    window.history.pushState({ path: newUrl }, '', newUrl)
+}
+
 function onSetFilterBy(filterBy) {
     filterBy = setBookFilter(filterBy)
     renderBooks()
-
-    const queryStringParams = `?name=${filterBy.name}&maxPrice=${filterBy.maxPrice}&minRate=${filterBy.minRate}`
-    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryStringParams
-    window.history.pushState({ path: newUrl }, '', newUrl)
-
+    updateQueryString()
 }
 
 function renderFilterByQueryStringParams() {
@@ -152,7 +155,12 @@ function onSetLang(lang) {
     setLang(lang)
     if (lang === 'he') document.body.classList.add('rtl')
     else document.body.classList.remove('rtl')
+    gLanguage = lang
+    gOptions.currency = (gLanguage === 'en') ? 'USD' : 'ILS'
+    updateQueryString()
     renderBooks()
-    doTrans()
-    language = lang
+}
+
+function formatCurrency(num) {
+    return new Intl.NumberFormat(gLanguage, gOptions).format(num)
 }

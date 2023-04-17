@@ -109,6 +109,10 @@ function setBookFilter(filterBy) {
     return gFilterBy
 }
 
+function getFilterBy() {
+    return gFilterBy
+}
+
 function prevPage() {
     gPageIdx--
     if (gPageIdx * PAGE_SIZE <= 0) {

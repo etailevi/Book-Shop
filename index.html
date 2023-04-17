@@ -29,12 +29,12 @@
                 <label>
                     <span data-trans="max-price">Max Price:</span>
                     <input type="range" min="0" max="100" value="25" class="filter-price-range"
-                        onchange="this.title=this.value;onSetFilterBy({maxPrice: this.value})" />
+                        onchange="this.title=this.value;onSetFilterBy({maxPrice: +this.value})" />
                 </label>
                 <label>
                     <span data-trans="min-rate">Min Rate:</span>
                     <input type="range" min="0" max="10" value="0" class="filter-rate-range"
-                        onchange="this.title=this.value;onSetFilterBy({minRate: this.value})" />
+                        onchange="this.title=this.value;onSetFilterBy({minRate: +this.value})" />
                 </label>
             </section>
             <hr>
